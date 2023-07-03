@@ -56,11 +56,44 @@ const onDelete = async e => {
 
   bookmarkElementToDelete.parentNode.removeChild(bookmarkElementToDelete);
 
-  chrome.tabs.sendMessage(activeTab.id, {
-    type: "DELETE",
-    value: bookmarkTime,
-  }, viewBookmarks);
+  chrome.storage.sync.get([activeTab.url], function(result) {
+    let bookmarksArray = result[activeTab.url];
+    let bookmarkIndex = bookmarksArray.findIndex(bookmark => bookmark.time === bookmarkTime);
+    
+    if (bookmarkIndex !== -1) {
+      bookmarksArray.splice(bookmarkIndex, 1);
+      chrome.storage.sync.set({[activeTab.url]: bookmarksArray}, function() {
+        console.log('Bookmark is deleted from the storage.');
+      });
+    }
+  });
 };
+
+
+// const onDelete = async e => {
+//   const bookmarkTime = e.target.parentNode.parentNode.getAttribute("timestamp");
+//   const bookmarkElementToDelete = document.getElementById(
+//     "bookmark-" + bookmarkTime
+//   );
+
+//   bookmarkElementToDelete.parentNode.removeChild(bookmarkElementToDelete);
+
+//   chrome.runtime.getBackgroundPage((backgroundPage) => {
+//     backgroundPage.handleMessage({
+//       type: "DELETE",
+//       value: bookmarkTime,
+//     }).then((response) => {
+//       // Handle the response here if you need to do something with it
+//       // For example, if the response contains the updated bookmark list, 
+//       // you can update the UI to reflect the change.
+//       const updatedBookmarks = response.bookmarks;
+//       viewBookmarks(updatedBookmarks);
+//     });
+//   });
+// };
+
+
+
 
 const setBookmarkAttributes =  (src, eventListener, controlParentElement) => {
   const controlElement = document.createElement("img");

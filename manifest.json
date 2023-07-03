@@ -5,7 +5,7 @@
   "permissions": ["storage", "tabs"],
   "host_permissions": ["https://*.youtube.com/*"],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "wrapper.js"
   },
   "content_scripts": [
     {
